@@ -140,8 +140,6 @@ build_ievm() {
       --network bridge=br0 \
       --vnc --vnclisten=0.0.0.0 --noautoconsole \
       --autostart
-    #virsh -c qemu:///system snapshot-create "${vm}"
-    #virsh -c qemu:///system start "${vm}"
   fi
 
 }
