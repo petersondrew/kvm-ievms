@@ -44,7 +44,7 @@ The VHD archives are massive and can take hours or tens of minutes to
 download, depending on the speed of your internet connection. You might want
 to start the install and then go catch a movie, or maybe dinner, or both.
 
-Once available and started in VirtualBox, the password for ALL VMs is "Password1".
+Once available and started in KVM, the password for ALL VMs is "Password1".
 
 
 Recovering from a failed installation
