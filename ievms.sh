@@ -122,16 +122,17 @@ build_ievm() {
   if ! virsh dominfo "${vm}" 2>&-
   then
 
-    log "Creating ${vm} VM"
+    log "Converting disk image to QCOW2 format to support snapshots (this may take a while)"
     qemu-img convert "${img_path}/${vhd}" -O qcow2 "${img_path}/${img}"
     rm "${img_path}/${vhd}"
-    sudo virt-install -n "${vm}" --import --hvm --os-type=windows --os-variant=${os_variant} -r 256 \
-      --disk "${img_path}/${img}",device=disk,bus=ide \
-      --disk "${virtio_iso}",device=cdrom,bus=ide \
+    log "Creating ${vm} VM"
+    virt-install --connect=qemu:///system -n "${vm}" --import --hvm --os-type=windows --os-variant=${os_variant} -r 256 \
+      --disk "${img_path}/${img}",device=disk,bus=ide,format=qcow2 \
+      --disk "${ievms_home}/${virtio_iso}",device=cdrom,bus=ide \
       --network bridge=br0 \
       --vnc --vnclisten=0.0.0.0 --noautoconsole
-    virsh snapshot-create "${vm}"
-    virst start "${vm}"
+    virsh -c qemu:///system snapshot-create "${vm}"
+    virsh -c qemu:///system start "${vm}"
   fi
 
 }

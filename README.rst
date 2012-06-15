@@ -17,7 +17,7 @@ Requirements
 * bridge-utils (Debian/Ubuntu: ``sudo apt-get install bridge-utils``)
 * aria2 (Debian/Ubuntu: ``sudo apt-get install aria2``)
 * unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
-* sudo (along with superuser permissions)
+* sudo (along with superuser permissions, this is needed for libvirt operations)
 * Patience
 
 
@@ -32,11 +32,11 @@ Installation
 
    * Install IE versions 6, 7, 8 and 9.
 
-         curl -s https://raw.github.com/petersondrew/kvm-ievms/master/ievms.sh | bash
+         sudo ./ievms.sh
 
    * Install specific IE versions (IE7 and IE9 only for example):
 
-         curl -s https://raw.github.com/petersondrew/kvm-ievms/master/ievms.sh | IEVMS_VERSIONS="7 9" bash
+         sudo IEVMS_VERSIONS="7 9" ./ievms.sh
 
 4. Connect to your virtual machines via vnc.
 
@@ -62,7 +62,7 @@ Specifying the install path
 
 To specify where the VMs are installed, use the INSTALL_PATH variable:
 
-    curl -s https://raw.github.com/petersondrew/ievms/master/ievms.sh | INSTALL_PATH="/Path/to/.ievms" bash
+    sudo INSTALL_PATH="/Path/to/.ievms" ./ievms.sh
 
 
 Passing additional options to aria
@@ -71,7 +71,7 @@ Passing additional options to aria
 The ``aria2`` command is passed any options present in the ``ARIA_OPTS`` 
 environment variable. For example, you can set a download speed limit:
 
-    curl -s https://raw.github.com/petersondrew/ievms/master/ievms.sh | ARIA_OPTS="--limit-rate 50k" bash
+    sudo ARIA_OPTS="--limit-rate 50k" ./ievms.sh
 
 
 Features
