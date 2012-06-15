@@ -109,7 +109,7 @@ build_ievm() {
   virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
   virtio_iso=$(basename $virtio_url)
 
-  if [[ ! -f "${ievms_home}/${vhd}" ]]
+  if [[ ! -f "${ievms_home}/${virtio_iso}" ]]
   then    log "Downloading latest VirtIO drivers from ${virtio_url}"
     if ! aria2c -c -d ${ievms_home} "${virtio_url}"
     then
