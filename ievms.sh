@@ -22,7 +22,7 @@ create_home() {
 
 check_system() {
   # Check for supported system
-  kernel=`uname -s`
+  kernel=$(uname -s)
   case $kernel in
     Linux) ;;
     *) fail "Sorry, $kernel is not supported." ;;
@@ -30,20 +30,22 @@ check_system() {
 }
 
 check_kvm() {
-  log "Checking for KVM/libvirt-bin/virsh"
-  which kvm 1>&- 2>&- || fail "kvm is not installed"
-  which virt-install 1>&- 2>&- || fail "libvirt-bin (virt-install) is not installed"
-  which virsh 1>&- 2>&- || fail "virsh is not installed"
+  log "Checking for KVM"
+  which kvm 2>&- || fail "kvm is not installed"
+  log "Checking for virt-install"
+  which virt-install 2>&- || fail "virt-install is not installed"
+  log "Checking for virsh"
+  which virsh 2>&- || fail "virsh is not installed"
 }
 
 check_unrar() {
-  PATH="${PATH}:${ievms_home}/rar"
-  which unrar 1>&- 2>&- || fail "unrar is not installed (unrar-free will not work either)"
+  log "Checking for unrar"
+  which unrar 2>&- || fail "unrar is not installed (unrar-free will not work either)"
 }
 
 check_aria() {
  log "Checking for aria2"
- which aria2 1>&- 2>&- || fail "aria2 is not installed"
+ which aria2c 2>&- || fail "aria2 is not installed"
 }
 
 build_ievm() {
@@ -54,17 +56,17 @@ build_ievm() {
       os_variant="winxp"
       ;;
     7)
-      urls=`echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_Vista_IE7.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar}`
+      urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_Vista_IE7.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar})
       vhd="Windows Vista.vhd"
       os_variant="vista"
       ;;
     8)
-      urls=`echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE8.part0{1.exe,2.rar,3.rar,4.rar}`
+      urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE8.part0{1.exe,2.rar,3.rar,4.rar})
       vhd="Win7_IE8.vhd"
       os_variant="win7"
       ;;
     9)
-      urls=`echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE9.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar,7.rar}`
+      urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE9.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar,7.rar})
       vhd="Windows 7.vhd"
       os_variant="win7"
       ;;
@@ -85,10 +87,9 @@ build_ievm() {
     log "Checking for downloaded VHDs at ${vhd_path}/"
     for url in $urls
     do
-      archive=`basename $url`
-      log "Downloading VHD from ${url} to ${ievms_home}/"
-      #if ! curl ${curl_opts} -C - -L -O "${url}"
-      if ! aria2 ${aria_opts} -c -d ${ievms_home} "${url}"
+      archive=$(basename $url)
+      log "Downloading VHD from ${url} to ${vhd_path}/"
+      if ! aria2c ${aria_opts} -c -d ${vhd_path} "${url}"
       then
         fail "Failed to download ${url} to ${vhd_path}/ using 'aria2', error code ($?)"
       fi
@@ -109,9 +110,9 @@ build_ievm() {
   then
 
     virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
-    virtio_iso=`basename $virtio_url`
+    virtio_iso=$(basename $virtio_url)
     log "Downloading latest VirtIO drivers from ${virtio_url}"
-    if ! aria2 -c -d ${ievms_home} "${virtio_url}"
+    if ! aria2c -c -d ${ievms_home} "${virtio_url}"
     then
       fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
     fi
