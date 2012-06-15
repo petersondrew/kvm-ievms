@@ -12,7 +12,8 @@ and IE9 running in separate virtual machines.
 Requirements
 ============
 
-* KVM (Debian/Ubuntu: ``sudo apt-get install kvm``)
+* KVM/qemu-img (Debian/Ubuntu: ``sudo apt-get install kvm``)
+* virt-install/virsh (Debian/Ubuntu: ``sudo apt-get install libvirt-bin``)
 * bridge-utils (Debian/Ubuntu: ``sudo apt-get install bridge-utils``)
 * aria2 (Debian/Ubuntu: ``sudo apt-get install aria2``)
 * unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
