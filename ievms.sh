@@ -76,32 +76,44 @@ build_ievm() {
   esac
 
   vm="IE${1}"
-  vhd_path="${ievms_home}/vhd/${vm}"
-  mkdir -p "${vhd_path}"
-  cd "${vhd_path}"
+  img_path="${ievms_home}/images/${vm}"
+  img="${os_variant}.qcow2"
+  mkdir -p "${img_path}"
+  cd "${img_path}"
 
-  log "Checking for existing VHD at ${vhd_path}/${vhd}"
+  log "Checking for existing VHD at ${img_path}/${vhd}"
   if [[ ! -f "${vhd}" ]]
   then
 
-    log "Checking for downloaded VHDs at ${vhd_path}/"
+    log "Checking for downloaded VHDs at ${img_path}/"
     for url in $urls
     do
       archive=$(basename $url)
-      log "Downloading VHD from ${url} to ${vhd_path}/"
-      if ! aria2c ${aria_opts} -c -d ${vhd_path} "${url}"
+      log "Downloading VHD from ${url} to ${img_path}/"
+      if ! aria2c ${aria_opts} -c -d ${img_path} "${url}"
       then
-        fail "Failed to download ${url} to ${vhd_path}/ using 'aria2', error code ($?)"
+        fail "Failed to download ${url} to ${img_path}/ using 'aria2', error code ($?)"
       fi
     done
 
-    rm -f "${vhd_path}/"*.vmc
+    rm -f "${img_path}/"*.vmc
 
-    log "Extracting VHD from ${vhd_path}/${archive}"
+    log "Extracting VHD from ${img_path}/${archive}"
     if ! unrar e -y "${archive}"
     then
-      fail "Failed to extract ${archive} to ${vhd_path}/${vhd}," \
+      fail "Failed to extract ${archive} to ${img_path}/${vhd}," \
         "unrar command returned error code $?"
+    fi
+  fi
+
+  virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
+  virtio_iso=$(basename $virtio_url)
+
+  if [[ ! -f "${ievms_home}/${vhd}" ]]
+  then    log "Downloading latest VirtIO drivers from ${virtio_url}"
+    if ! aria2c -c -d ${ievms_home} "${virtio_url}"
+    then
+      fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
     fi
   fi
 
@@ -109,20 +121,14 @@ build_ievm() {
   if ! virsh dominfo "${vm}" 2>&-
   then
 
-    virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
-    virtio_iso=$(basename $virtio_url)
-    log "Downloading latest VirtIO drivers from ${virtio_url}"
-    if ! aria2c -c -d ${ievms_home} "${virtio_url}"
-    then
-      fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
-    fi
-
     log "Creating ${vm} VM"
-    virt-install -n "${vm}" --import --hvm --os-type=windows --os-variant=${os_variant} -r 256 \
-      --disk "${vhd_path}/${vhd}",device=disk,bus=ide \
-      -c "${virtio_iso}" \
+    qemu-img convert "${img_path}/${vhd}" -O qcow2 "${img_path}/${img}"
+    rm "${img_path}/${vhd}"
+    sudo virt-install -n "${vm}" --import --hvm --os-type=windows --os-variant=${os_variant} -r 256 \
+      --disk "${img_path}/${img}",device=disk,bus=ide \
+      --disk "${virtio_iso}",device=cdrom,bus=ide \
       --network bridge=br0 \
-      --graphics vnc,listen=0.0.0.0 --noautoconsole
+      --vnc --vnclisten=0.0.0.0 --noautoconsole
     virsh snapshot-create "${vm}"
     virst start "${vm}"
   fi

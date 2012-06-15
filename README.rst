@@ -13,8 +13,10 @@ Requirements
 ============
 
 * KVM (Debian/Ubuntu: ``sudo apt-get install kvm``)
+* bridge-utils (Debian/Ubuntu: ``sudo apt-get install bridge-utils``)
 * aria2 (Debian/Ubuntu: ``sudo apt-get install aria2``)
-* Linux Only: unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
+* unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
+* sudo (along with superuser permissions)
 * Patience
 
 
@@ -23,7 +25,9 @@ Installation
 
 1. Install KVM.
 
-2. Download and unpack ievms:
+3. Create ``br0`` network bridge interface. (http://wiki.debian.org/BridgeNetworkConnections)
+
+3. Download and unpack ievms:
 
    * Install IE versions 6, 7, 8 and 9.
 
@@ -33,7 +37,7 @@ Installation
 
          curl -s https://raw.github.com/petersondrew/kvm-ievms/master/ievms.sh | IEVMS_VERSIONS="7 9" bash
 
-3. Connect to your virtual machines via vnc.
+4. Connect to your virtual machines via vnc.
 
 The VHD archives are massive and can take hours or tens of minutes to
 download, depending on the speed of your internet connection. You might want
