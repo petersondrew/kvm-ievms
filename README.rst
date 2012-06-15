@@ -60,13 +60,13 @@ To specify where the VMs are installed, use the INSTALL_PATH variable:
     curl -s https://raw.github.com/petersondrew/ievms/master/ievms.sh | INSTALL_PATH="/Path/to/.ievms" bash
 
 
-Passing additional options to curl
+Passing additional options to aria
 ----------------------------------
 
 The ``aria2`` command is passed any options present in the ``ARIA_OPTS`` 
 environment variable. For example, you can set a download speed limit:
 
-    curl -s https://raw.github.com/petersondrew/ievms/master/ievms.sh | CURL_OPTS="--limit-rate 50k" bash
+    curl -s https://raw.github.com/petersondrew/ievms/master/ievms.sh | ARIA_OPTS="--limit-rate 50k" bash
 
 
 Features
