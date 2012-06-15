@@ -81,6 +81,18 @@ build_ievm() {
   mkdir -p "${img_path}"
   cd "${img_path}"
 
+  virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
+  virtio_iso=$(basename $virtio_url)
+
+  if [[ ! -f "${ievms_home}/${virtio_iso}" ]]
+  then
+    log "Downloading latest VirtIO drivers from ${virtio_url}"
+    if ! aria2c -c -d ${ievms_home} "${virtio_url}"
+    then
+      fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
+    fi
+  fi
+
   log "Checking for existing VHD at ${img_path}/${vhd}"
   if [[ ! -f "${vhd}" ]]
   then
@@ -103,17 +115,6 @@ build_ievm() {
     then
       fail "Failed to extract ${archive} to ${img_path}/${vhd}," \
         "unrar command returned error code $?"
-    fi
-  fi
-
-  virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
-  virtio_iso=$(basename $virtio_url)
-
-  if [[ ! -f "${ievms_home}/${virtio_iso}" ]]
-  then    log "Downloading latest VirtIO drivers from ${virtio_url}"
-    if ! aria2c -c -d ${ievms_home} "${virtio_url}"
-    then
-      fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
     fi
   fi
 
