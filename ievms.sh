@@ -164,7 +164,7 @@ build_ievm() {
     log "Migrating libvirt domain definition for ${vm} from raw to qcow2"
     log "See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600017 and https://bugs.launchpad.net/ubuntu/+source/virtinst/+bug/655392"
     virsh destroy "${vm}"
-    libvirt-migrate-qemu-disks --connect=qemu:///system -t qcow2 "${vm}"
+    libvirt-migrate-qemu-disks -c qemu:///system -t qcow2 "${vm}"
 
     # XP fix for IDE drivers
     if $merge_ide ; then
