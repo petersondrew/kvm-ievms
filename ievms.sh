@@ -42,6 +42,8 @@ check_kvm() {
   which virt-install 2>&- || fail "virt-install is not installed"
   log "Checking for virsh"
   which virsh 2>&- || fail "virsh is not installed"
+  log "Checking for libvirt-migrate-qemu-disks"
+  which libvirt-migrate-qemu-disks 2>&- || fail "libvirt-migrate-qemu-disks is not installed. If you are a Debian user, see README under the 3rdparty folder."
 }
 
 check_unrar() {
@@ -57,24 +59,32 @@ check_aria() {
 build_ievm() {
   case $1 in
     6)
+      # IE6 vm only
+      log "Checking for virt-win-reg"
+      which virt-win-reg 2>&- || fail "virt-win-reg is not installed"
       urls="http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_XP_IE6.exe"
       vhd="Windows XP.vhd"
       os_variant="winxp"
+      # https://www.virtualbox.org/attachment/wiki/Migrate_Windows/MergeIDE.zip
+      merge_ide=true
       ;;
     7)
       urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_Vista_IE7.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar})
       vhd="Windows Vista.vhd"
       os_variant="vista"
+      merge_ide=false
       ;;
     8)
       urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE8.part0{1.exe,2.rar,3.rar,4.rar})
       vhd="Win7_IE8.vhd"
       os_variant="win7"
+      merge_ide=false
       ;;
     9)
       urls=$(echo http://download.microsoft.com/download/B/7/2/B72085AE-0F04-4C6F-9182-BF1EE90F5273/Windows_7_IE9.part0{1.exe,2.rar,3.rar,4.rar,5.rar,6.rar,7.rar})
       vhd="Windows 7.vhd"
       os_variant="win7"
+      merge_ide=false
       ;;
     *)
       fail "Invalid IE version: ${1}"
@@ -90,6 +100,7 @@ build_ievm() {
   virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
   virtio_iso=$(basename $virtio_url)
 
+  # Download if it doesn't exist in the root, each VM needs its own copy since it complains about sharing media
   if [[ ! -f "${ievms_home}/${virtio_iso}" ]]
   then
     log "Downloading latest VirtIO drivers from ${virtio_url}"
@@ -97,6 +108,12 @@ build_ievm() {
     then
       fail "Failed to download "${virtio_url}" to ${ievms_home}/ using 'aria2', error code ($?)"
     fi
+  fi
+
+  if [[ ! -f "${img_path}/${virtio_iso}" ]]
+  then
+    log "Copying virtio driver image to ${img_path}"
+    cp "${ievms_home}/${virtio_iso}" "${img_path}/"
   fi
 
   log "Checking for existing VHD at ${img_path}/${vhd}"
@@ -136,10 +153,26 @@ build_ievm() {
     log "Creating ${vm} VM"
     virt-install --connect=qemu:///system -n "${vm}" --import --hvm --os-type=windows --os-variant=${os_variant} -r 256 \
       --disk "${img_path}/${img}",device=disk,bus=ide,format=qcow2 \
-      --disk "${ievms_home}/${virtio_iso}",device=cdrom,bus=ide \
-      --network bridge=br0 \
+      --disk "${img_path}/${virtio_iso}",device=cdrom,bus=ide \
+      --network bridge=br0,model=virtio \
       --vnc --vnclisten=0.0.0.0 --noautoconsole \
       --autostart
+
+    # Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600017
+    # https://bugs.launchpad.net/ubuntu/+source/virtinst/+bug/655392
+    # Shouldn't adversely effect patched versions
+    log "Migrating libvirt domain definition for ${vm} from raw to qcow2"
+    log "See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600017 and https://bugs.launchpad.net/ubuntu/+source/virtinst/+bug/655392"
+    virsh destroy "${vm}"
+    libvirt-migrate-qemu-disks --connect=qemu:///system -t qcow2 "${vm}"
+
+    # XP fix for IDE drivers
+    if $merge_ide ; then
+      log "Merging IDE devices to avoid BSOD on first boot"
+      virt-win-reg --merge "${img_path}/${img}" "${ievms_home}/MergeIDE.reg"
+    fi
+
+    virsh start "${vm}"
   fi
 
 }

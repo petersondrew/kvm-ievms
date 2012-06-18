@@ -14,6 +14,9 @@ Requirements
 
 * KVM/qemu-img (Debian/Ubuntu: ``sudo apt-get install kvm``)
 * virt-install/virsh (Debian/Ubuntu: ``sudo apt-get install libvirt-bin``)
+* virt-win-reg (Debian: http://people.debian.org/~bengen/libguestfs/ ; Ubuntu: ``sudo apt-get install libguestfs-tools``)
+  * Debian users also require kernel >= 2.6.34, available from the backports
+* libvirt-migrate-qemu-disks (Debian: See 3rdparty folder ; Ubuntu: ``sudo apt-get install libvirt-bin``)
 * bridge-utils (Debian/Ubuntu: ``sudo apt-get install bridge-utils``)
 * aria2 (Debian/Ubuntu: ``sudo apt-get install aria2``)
 * unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
