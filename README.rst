@@ -73,7 +73,7 @@ Passing additional options to aria
 The ``aria2`` command is passed any options present in the ``ARIA_OPTS`` 
 environment variable. For example, you can set a download speed limit:
 
-    sudo ARIA_OPTS="--limit-rate 50k" ./ievms.sh
+    sudo ARIA_OPTS="--max-download-limit=50K" ./ievms.sh
 
 
 Features
