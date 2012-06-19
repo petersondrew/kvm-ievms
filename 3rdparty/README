@@ -1,4 +1,0 @@
-libvirt-migrate-qemu-disks is available in the libvirt-bin package under Ubuntu, but not Debian squeeze.
-You may refer to https://bazaar.launchpad.net/~ubuntu-branches/ubuntu/oneiric/libvirt/oneiric/view/head:/debian/libvirt-migrate-qemu-disks for the code, or the copy included here.
-This code is not being distributed as part of the kvm-ievms project, it is under its own license (GPL3).
-Make sure libvirt-migrate-qemu-disks is installed in your $PATH.

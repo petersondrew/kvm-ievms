@@ -146,8 +146,8 @@ build_ievm() {
   then
 
     log "Converting disk image to QCOW2 format to support snapshots (this may take a while)"
-    qemu-img convert "${img_path}/${vhd}" -O qcow2 "${img_path}/${img}"
-    rm "${img_path}/${vhd}"
+    qemu-img convert "${img_path}/${vhd}" -O qcow2 "${img_path}/${img}" > /dev/null
+    [ -f "${img_path}/${vhd}" ] && rm "${img_path}/${vhd}"
     log "Creating clean snapshot for later restoration"
     qemu-img snapshot -c clean "${img_path}/${img}"
     log "Creating ${vm} VM"
@@ -156,15 +156,44 @@ build_ievm() {
       --disk "${img_path}/${virtio_iso}",device=cdrom,bus=ide \
       --network bridge=br0,model=virtio \
       --vnc --vnclisten=0.0.0.0 --noautoconsole \
-      --autostart
+      --autostart > /dev/null
 
     # Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600017
     # https://bugs.launchpad.net/ubuntu/+source/virtinst/+bug/655392
     # Shouldn't adversely effect patched versions
-    log "Migrating libvirt domain definition for ${vm} from raw to qcow2"
+    log "Migrating libvirt domain definition for ${vm} from raw to qcow2 if necessary"
     log "See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600017 and https://bugs.launchpad.net/ubuntu/+source/virtinst/+bug/655392"
-    virsh destroy "${vm}"
-    libvirt-migrate-qemu-disks -c qemu:///system -t qcow2 "${vm}"
+    virsh destroy "${vm}" > /dev/null
+    [ -f "${img_path}/${vm}.xml" ] && rm "${img_path}/${vm}.xml"
+    # Loop through definition and try to rewrite the driver line for the hd
+    in_hd_tag=false
+    found_driver=false
+    virsh dumpxml "${vm}" 2>/dev/null | while read line ; do
+      if ! $in_hd_tag && echo "$line" | grep -q "<disk type='file' device='disk'" ; then
+        log "Found hard drive"
+        in_hd_tag=true
+      elif $in_hd_tag && ! $found_driver ; then
+        if echo "$line" | grep -q "<driver" ; then
+          log "Found driver"
+          found_driver=true
+          continue
+        fi
+        in_hd_tag=false
+      elif $found_driver ; then
+        log "Writing new driver"
+        echo "<driver name='qemu' type='qcow2'/>" >> "${img_path}/${vm}.xml"
+        found_driver=false
+        in_hd_tag=false
+      fi
+
+      # Write line to new definition
+      echo "$line" >> "${img_path}/${vm}.xml"
+      if [ "$line" = "</domain>" ]; then
+        # Redefine domain with new definition
+        virsh define "${img_path}/${vm}.xml" > /dev/null
+        break
+      fi
+    done
 
     # XP fix for IDE drivers
     if $merge_ide ; then
