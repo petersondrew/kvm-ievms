@@ -42,8 +42,6 @@ check_kvm() {
   which virt-install 2>&- || fail "virt-install is not installed"
   log "Checking for virsh"
   which virsh 2>&- || fail "virsh is not installed"
-  log "Checking for libvirt-migrate-qemu-disks"
-  which libvirt-migrate-qemu-disks 2>&- || fail "libvirt-migrate-qemu-disks is not installed. If you are a Debian user, see README under the 3rdparty folder."
 }
 
 check_unrar() {
