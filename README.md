@@ -1,6 +1,7 @@
+[![endorse](http://api.coderwall.com/petersondrew/endorsecount.png)](http://coderwall.com/petersondrew)
+
 Overview
 ========
-
 Microsoft provides virtual machine disk images to facilitate website testing
 in multiple versions of IE, regardless of the host operating system.
 Unfortunately, setting these virtual machines up without Microsoft's VirtualPC
@@ -11,11 +12,10 @@ and IE9 running in separate virtual machines.
 
 Requirements
 ============
-
 * KVM/qemu-img (Debian/Ubuntu: ``sudo apt-get install kvm``)
 * virt-install/virsh (Debian/Ubuntu: ``sudo apt-get install libvirt-bin``)
 * virt-win-reg (Debian: http://people.debian.org/~bengen/libguestfs/ ; Ubuntu: ``sudo apt-get install libguestfs-tools``)
-  * Debian users also require kernel >= 2.6.34, available from the backports
+  - Debian users also require kernel >= 2.6.34, available from the backports
 * bridge-utils (Debian/Ubuntu: ``sudo apt-get install bridge-utils``)
 * aria2 (Debian/Ubuntu: ``sudo apt-get install aria2``)
 * unrar (nonfree) (Debian/Ubuntu: ``sudo apt-get install unrar``)
@@ -25,7 +25,6 @@ Requirements
 
 Installation
 ============
-
 1. Install KVM.
 
 3. Create ``br0`` network bridge interface. (http://wiki.debian.org/BridgeNetworkConnections)
@@ -34,11 +33,11 @@ Installation
 
    * Install IE versions 6, 7, 8 and 9.
 
-         sudo ./ievms.sh
+     >sudo ./ievms.sh
 
    * Install specific IE versions (IE7 and IE9 only for example):
 
-         sudo IEVMS_VERSIONS="7 9" ./ievms.sh
+     >sudo IEVMS_VERSIONS="7 9" ./ievms.sh
 
 4. Connect to your virtual machines via vnc.
 
@@ -51,7 +50,6 @@ Once available and started in KVM, the password for ALL VMs is "Password1".
 
 Recovering from a failed installation
 -------------------------------------
-
 Each version is installed into a subdirectory of ``~/.ievms/vhd/``. If the installation fails
 for any reason (corrupted download, for instance), delete the version-specific subdirectory
 and rerun the install.
@@ -61,41 +59,38 @@ If nothing else, you can delete ``~/.ievms`` and rerun the install.
 
 Specifying the install path
 ---------------------------
-
 To specify where the VMs are installed, use the INSTALL_PATH variable:
 
-    sudo INSTALL_PATH="/Path/to/.ievms" ./ievms.sh
+>sudo INSTALL_PATH="/Path/to/.ievms" ./ievms.sh
 
 
 Passing additional options to aria
 ----------------------------------
-
 The ``aria2`` command is passed any options present in the ``ARIA_OPTS`` 
 environment variable. For example, you can set a download speed limit:
 
-    sudo ARIA_OPTS="--max-download-limit=50K" ./ievms.sh
+>sudo ARIA_OPTS="--max-download-limit=50K" ./ievms.sh
 
 
 Features
 ========
+###Clean Snapshot
+A snapshot is automatically taken upon install, allowing rollback to the
+pristine virtual environment configuration. Anything can go wrong in
+Windows and rather than having to worry about maintaining a stable VM,
+you can simply revert to the first snapshot to reset your VM to the
+initial state.
 
-Clean Snapshot
-    A snapshot is automatically taken upon install, allowing rollback to the
-    pristine virtual environment configuration. Anything can go wrong in
-    Windows and rather than having to worry about maintaining a stable VM,
-    you can simply revert to the first snapshot to reset your VM to the
-    initial state.
-
-    The VMs provided by Microsoft will not pass the Windows Genuine Advantage
-    and cannot be activated. Unfortunately for us, that means our VMs will
-    lock us out after 30 days of unactivated use. By reverting to the
-    clean snapshot the countdown to the activation apocalypse is reset,
-    effectively allowing your VM to work indefinitely.
+The VMs provided by Microsoft will not pass the Windows Genuine Advantage
+and cannot be activated. Unfortunately for us, that means our VMs will
+lock us out after 30 days of unactivated use. By reverting to the
+clean snapshot the countdown to the activation apocalypse is reset,
+effectively allowing your VM to work indefinitely.
 
 
-Resuming Downloads
-    If one of the comically large files fails to download, the ``aria2``
-    command used will automatically attempt to resume where it left off.
+###Resuming Downloads
+If one of the comically large files fails to download, the ``aria2``
+command used will automatically attempt to resume where it left off.
 
 
 License
