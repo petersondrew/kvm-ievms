@@ -1,7 +1,7 @@
 [![endorse](http://api.coderwall.com/petersondrew/endorsecount.png)](http://coderwall.com/petersondrew)
 
 Overview
-========
+--------
 Microsoft provides virtual machine disk images to facilitate website testing
 in multiple versions of IE, regardless of the host operating system.
 Unfortunately, setting these virtual machines up without Microsoft's VirtualPC
@@ -11,7 +11,7 @@ and IE9 running in separate virtual machines.
 
 
 Requirements
-============
+------------
 * KVM/qemu-img (Debian/Ubuntu: ``sudo apt-get install kvm``)
 * virt-install/virsh (Debian/Ubuntu: ``sudo apt-get install libvirt-bin``)
 * virt-win-reg (Debian: http://people.debian.org/~bengen/libguestfs/ ; Ubuntu: ``sudo apt-get install libguestfs-tools``)
@@ -24,7 +24,7 @@ Requirements
 
 
 Installation
-============
+------------
 1. Install KVM.
 
 3. Create ``br0`` network bridge interface. (http://wiki.debian.org/BridgeNetworkConnections)
@@ -48,8 +48,7 @@ to start the install and then go catch a movie, or maybe dinner, or both.
 Once available and started in KVM, the password for ALL VMs is "Password1".
 
 
-Recovering from a failed installation
--------------------------------------
+###Recovering from a failed installation
 Each version is installed into a subdirectory of ``~/.ievms/vhd/``. If the installation fails
 for any reason (corrupted download, for instance), delete the version-specific subdirectory
 and rerun the install.
@@ -57,15 +56,13 @@ and rerun the install.
 If nothing else, you can delete ``~/.ievms`` and rerun the install.
 
 
-Specifying the install path
----------------------------
+###Specifying the install path
 To specify where the VMs are installed, use the INSTALL_PATH variable:
 
 >sudo INSTALL_PATH="/Path/to/.ievms" ./ievms.sh
 
 
-Passing additional options to aria
-----------------------------------
+###Passing additional options to aria
 The ``aria2`` command is passed any options present in the ``ARIA_OPTS`` 
 environment variable. For example, you can set a download speed limit:
 
@@ -73,7 +70,7 @@ environment variable. For example, you can set a download speed limit:
 
 
 Features
-========
+--------
 ###Clean Snapshot
 A snapshot is automatically taken upon install, allowing rollback to the
 pristine virtual environment configuration. Anything can go wrong in
@@ -94,7 +91,7 @@ command used will automatically attempt to resume where it left off.
 
 
 License
-=======
+-------
 Copyright (c) 2012 Drew Peterson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
