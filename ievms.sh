@@ -95,7 +95,7 @@ build_ievm() {
   mkdir -p "${img_path}"
   cd "${img_path}"
 
-  virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso"
+  virtio_url="https://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-49.iso"
   virtio_iso=$(basename $virtio_url)
 
   # Download if it doesn't exist in the root, each VM needs its own copy since it complains about sharing media
